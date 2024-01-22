@@ -1,14 +1,17 @@
 use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
 use std::error::Error;
+use std::hash::{Hash, Hasher};
+use std::u64;
+
 use clap::Parser;
 
 use crate::github::GitHub;
 use crate::meilisearch::Meilisearch;
 
+mod build;
+mod db;
 mod github;
 mod meilisearch;
-mod db;
 
 #[derive(Parser, Debug)]
 pub struct Opts {
@@ -47,7 +50,21 @@ async fn main() -> Result<(), Box<dyn Error + Sync + Send>> {
         ms_client.store(&[issue.clone()]).await?;
         let mut hasher = DefaultHasher::new();
         issue.hash(&mut hasher);
-        db.store(issue.id as i64, hasher.finish() as i64).await?;
+        db.store(u64_from_i64(issue.id), u64_from_i64(hasher.finish())).await?;
     }
     Ok(())
+}
+
+/// converts u64 -> i64 without information loss by wrapping around the remainder into the negative values
+const fn u64_from_i64(i: u64) -> i64 {
+    const MAX_VALUE: u64 = i64::MAX as u64;
+
+    let can_fit_without_conversion = i <= MAX_VALUE;
+    if can_fit_without_conversion {
+        #[allow(clippy::cast_possible_wrap)]
+        return i as i64;
+    }
+    let remainder = i % MAX_VALUE;
+    #[allow(clippy::neg_multiply)]
+    -(remainder as i64)
 }
