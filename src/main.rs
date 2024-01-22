@@ -39,8 +39,9 @@ pub struct Opts {
 async fn main() -> Result<(), Box<dyn Error + Sync + Send>> {
     let opt = Opts::parse();
     let ms_client = Meilisearch::new(opt.meili_url, opt.meili_master_key).await?;
-    let db=db::Db::new("download_log.sqlite").await?;
-    let github = GitHub::new(&opt.github_pat, &opt.owner, &opt.repo)?;
+    let db = db::Db::new("download_log.sqlite").await?;
+    let last_change_at = db.last_change_at().await?;
+    let github = GitHub::new(&opt.github_pat, &opt.owner, &opt.repo, &last_change_at)?;
     let mut issues = github.iter_issues().await?;
     while let Some(issue) = issues.next().await? {
         ms_client.store(&[issue.clone()]).await?;

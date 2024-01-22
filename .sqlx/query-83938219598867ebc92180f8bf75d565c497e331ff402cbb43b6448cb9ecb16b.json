@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT MAX(last_update_at) as last_change_at FROM issue_log",
+  "describe": {
+    "columns": [
+      {
+        "name": "last_change_at",
+        "ordinal": 0,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "83938219598867ebc92180f8bf75d565c497e331ff402cbb43b6448cb9ecb16b"
+}

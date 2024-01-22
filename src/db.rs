@@ -32,4 +32,20 @@ ON CONFLICT DO UPDATE SET hash=$2, last_update_at=$3"#,
         .await?;
         Ok(())
     }
+    pub async fn last_change_at(&self) -> Result<NaiveDateTime, Box<dyn Error + Send + Sync>> {
+        let res = query_as!(
+            LastChangeResult,
+            "SELECT MAX(last_update_at) as last_change_at FROM issue_log"
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+        match res {
+            None => Ok(NaiveDateTime::default()),
+            Some(res) => Ok(res.last_change_at.unwrap_or(NaiveDateTime::default())),
+        }
+    }
+}
+
+struct LastChangeResult {
+    last_change_at: Option<NaiveDateTime>,
 }
