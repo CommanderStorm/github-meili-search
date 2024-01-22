@@ -16,10 +16,10 @@ async fn main() -> Result<(), Box<dyn Error + Sync + Send>> {
         std::env::var("MEILI_MASTER_KEY").ok(),
     ).await?;
     let pat = std::env::var("GITHUB_PAT").expect("GITHUB_PAT is required to run this app");
-    let github = GitHub::setup(&pat, OWNER, REPO)?;
+    let github = GitHub::new(&pat, OWNER, REPO)?;
     let mut issues = github.iter_issues().await?;
     while let Some(issue) = issues.next().await? {
-        ms_client.store(issue).await?;
+        ms_client.store(&[issue]).await?;
     }
     Ok(())
 }

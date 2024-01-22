@@ -15,12 +15,12 @@ pub struct GitHub {
     repo: &'static str,
 }
 
-const TIME_BETWEEN_GITHUB_REQUESTS: Duration = Duration::from_millis(1000);
+const TIME_BETWEEN_GITHUB_REQUESTS: Duration = Duration::from_millis(500);
 
 const ITEMS_PER_PAGE: u8 = 100;
 
 impl GitHub {
-    pub fn setup(
+    pub fn new(
         pat: &str,
         owner: &'static str,
         repo: &'static str,
