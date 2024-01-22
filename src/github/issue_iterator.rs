@@ -17,11 +17,11 @@ pub struct IssueIterator {
     github: GitHub,
 }
 
-
 impl IssueIterator {
     pub async fn new(github: GitHub) -> Result<Self, Box<dyn Error + Sync + Send>> {
         let number_of_pages = github.number_of_issue_pages().await?;
-        let progress_bar = ProgressBar::new(number_of_pages as u64 * u64::from(super::ITEMS_PER_PAGE));
+        let progress_bar =
+            ProgressBar::new(number_of_pages as u64 * u64::from(super::ITEMS_PER_PAGE));
         println!("Downloading issues for the selected repository");
         progress_bar.set_style(
             ProgressStyle::default_bar()
@@ -42,7 +42,7 @@ impl IssueIterator {
         })
     }
 
-    pub(crate) async fn next(&mut self) -> Result<Option<SearchableIssue>, Box<dyn Error + Sync + Send>> {
+    pub async fn next(&mut self) -> Result<Option<SearchableIssue>, Box<dyn Error + Sync + Send>> {
         let issue = if let Some(issue) = self.current_page.items.get(self.issue_on_page_index) {
             issue
         } else {
@@ -54,11 +54,15 @@ impl IssueIterator {
             }
             self.issue_on_page_index = 0;
             self.page_index += 1;
-            let page_index = u32::try_from(self.page_index).expect("at 100 items per page u32::MAX can never be reached");
+            let page_index = u32::try_from(self.page_index)
+                .expect("at 100 items per page u32::MAX can never be reached");
             self.current_page = self.github.fetch_issues_page(page_index).await?;
-            self.current_page.items
+            self.current_page
+                .items
                 .get(self.issue_on_page_index)
-                .expect("got a new page from github, expecting that every page has at least 1 issue")
+                .expect(
+                    "got a new page from github, expecting that every page has at least 1 issue",
+                )
         };
         self.issue_on_page_index += 1;
 
@@ -69,7 +73,9 @@ impl IssueIterator {
             title = issue.title
         ));
         let comments = self.github.fetch_comments_for(issue.number).await?;
-        Ok(Some(SearchableIssue::from(issue.clone()).with_comments(comments)))
+        Ok(Some(
+            SearchableIssue::from(issue.clone()).with_comments(comments),
+        ))
     }
 }
 

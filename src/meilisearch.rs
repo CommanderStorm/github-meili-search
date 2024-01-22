@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 const TIMEOUT: Option<Duration> = Some(Duration::from_secs(20));
 const POLLING_RATE: Option<Duration> = Some(Duration::from_millis(50));
 
-pub(crate) struct Meilisearch {
+pub struct Meilisearch {
     client: Client,
 }
 
@@ -44,9 +44,15 @@ impl Meilisearch {
             ])
             .with_searchable_attributes(["id", "title", "body", "comments"])
     }
-    pub async fn new(host: String, api_key: Option<String>) -> Result<Self, Box<dyn Error + Sync + Send>> {
+    pub async fn new(
+        host: String,
+        api_key: Option<String>,
+    ) -> Result<Self, Box<dyn Error + Sync + Send>> {
         let client = Client::new(host.clone(), api_key);
-        meilisearch_sdk::ExperimentalFeatures::new(&client).set_vector_store(true).update().await?;
+        meilisearch_sdk::ExperimentalFeatures::new(&client)
+            .set_vector_store(true)
+            .update()
+            .await?;
 
         // create a fresh index
         let _ = client.delete_index("issues").await;
@@ -54,7 +60,8 @@ impl Meilisearch {
             .create_index("issues", Some("id"))
             .await?
             .wait_for_completion(&client, POLLING_RATE, TIMEOUT)
-            .await? {
+            .await?
+        {
             return Err(io::Error::other(format!("could not create index: {content:#?}")).into());
         }
         let issues = client.index("issues");
@@ -70,9 +77,18 @@ impl Meilisearch {
             }
         };
         let url = format!("{host}/indexes/issues/settings");
-        let res = req_client.patch(url).json(&embedding_settings).send().await?;
+        let res = req_client
+            .patch(url)
+            .json(&embedding_settings)
+            .send()
+            .await?;
         if res.status() != 202 {
-            return Err(io::Error::other(format!("Failed to enable embedding because {code}: {text}", code = res.status(), text = res.text().await?)).into());
+            return Err(io::Error::other(format!(
+                "Failed to enable embedding because {code}: {text}",
+                code = res.status(),
+                text = res.text().await?
+            ))
+            .into());
         }
 
         let settings = Meilisearch::setttings();
@@ -88,10 +104,13 @@ impl Meilisearch {
             _ => Ok(Self { client }),
         }
     }
-    pub async fn store<T: Serialize>(&self, documents: &[T]) -> Result<(), Box<dyn Error + Sync + Send>> {
+    pub async fn store<T: Serialize>(
+        &self,
+        documents: &[T],
+    ) -> Result<(), Box<dyn Error + Sync + Send>> {
         let issues = self.client.index("issues");
         let res = issues
-            .add_documents(&documents, Some("id"))
+            .add_documents(documents, Some("id"))
             .await?
             .wait_for_completion(&self.client, POLLING_RATE, TIMEOUT)
             .await?;
@@ -99,7 +118,7 @@ impl Meilisearch {
             Task::Failed { content } => Err(io::Error::other(format!(
                 "Failed to add documents to Meilisearch: {content:#?}"
             ))
-                .into()),
+            .into()),
             _ => Ok(()),
         }
     }

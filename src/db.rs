@@ -1,9 +1,9 @@
 use std::error::Error;
-use std::time::{SystemTime, UNIX_EPOCH};
 
+use sqlx::query_as;
 use sqlx::sqlite::SqliteConnectOptions;
+use sqlx::types::chrono::NaiveDateTime;
 use sqlx::SqlitePool;
-use sqlx::types::chrono::DateTime;
 
 pub struct Db {
     pool: SqlitePool,
@@ -19,11 +19,17 @@ impl Db {
         Ok(Self { pool })
     }
     pub async fn store(&self, id: i64, hash: i64) -> Result<(), Box<dyn Error + Send + Sync>> {
-        let now_timestamp = SystemTime::now().duration_since(UNIX_EPOCH).expect("time does not move backwards");
-        let now = DateTime::from_timestamp(now_timestamp.as_secs() as i64, now_timestamp.subsec_nanos()).expect("current time is a valid timestamp");
-        sqlx::query!(r#"INSERT INTO issue_log(id, hash, last_update_at)
+        let now = chrono::Utc::now();
+        sqlx::query!(
+            r#"INSERT INTO issue_log(id, hash, last_update_at)
 VALUES ($1, $2, $3)
-ON CONFLICT DO UPDATE SET hash=$2, last_update_at=$3"#, id, hash, now).execute(&self.pool).await?;
+ON CONFLICT DO UPDATE SET hash=$2, last_update_at=$3"#,
+            id,
+            hash,
+            now
+        )
+        .execute(&self.pool)
+        .await?;
         Ok(())
     }
 }
