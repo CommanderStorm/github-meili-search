@@ -43,6 +43,13 @@ Customize the indexing process by modifying the configuration options in the con
 ## Contributing
 Contributions are highly encouraged! If you have ideas for improvements or find any issues, please open an issue or submit a pull request.
 
+If you have modified sqlx queries, don't forget to run
+```shell
+cargo sqlx database create --database-url sqlite://download_log.sqlite
+cargo sqlx migrate run --database-url sqlite://download_log.sqlite
+cargo sqlx prepare --database-url sqlite://download_log.sqlite
+```
+
 ## License
 This project is licensed under the MIT License. Feel free to use and modify the code according to your needs.
 

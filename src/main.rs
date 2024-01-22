@@ -1,3 +1,5 @@
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use std::error::Error;
 use clap::Parser;
 
@@ -41,7 +43,10 @@ async fn main() -> Result<(), Box<dyn Error + Sync + Send>> {
     let github = GitHub::new(&opt.github_pat, &opt.owner, &opt.repo)?;
     let mut issues = github.iter_issues().await?;
     while let Some(issue) = issues.next().await? {
-        ms_client.store(&[issue]).await?;
+        ms_client.store(&[issue.clone()]).await?;
+        let mut hasher = DefaultHasher::new();
+        issue.hash(&mut hasher);
+        db.store(issue.id as i64, hasher.finish() as i64).await?;
     }
     Ok(())
 }

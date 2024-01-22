@@ -69,7 +69,7 @@ impl Meilisearch {
                 }
             }
         };
-        let url = host.clone() + "/indexes/issues/settings";
+        let url = format!("{host}/indexes/issues/settings");
         let res = req_client.patch(url).json(&embedding_settings).send().await?;
         if res.status() != 202 {
             return Err(io::Error::other(format!("Failed to enable embedding because {code}: {text}", code = res.status(), text = res.text().await?)).into());

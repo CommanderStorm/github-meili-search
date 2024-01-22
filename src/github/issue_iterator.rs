@@ -73,9 +73,9 @@ impl IssueIterator {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash)]
 pub struct SearchableIssue {
-    id: u64,
+    pub id: u64,
     title: String,
     body: String,
     comments: Vec<SearchableComment>,
@@ -101,7 +101,7 @@ impl SearchableIssue {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash)]
 pub struct SearchableComment {
     author: String,
     content: String,
