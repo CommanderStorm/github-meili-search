@@ -11,8 +11,8 @@ mod issue_iterator;
 
 pub struct GitHub {
     client: Octocrab,
-    owner: &'static str,
-    repo: &'static str,
+    owner: String,
+    repo: String,
 }
 
 const TIME_BETWEEN_GITHUB_REQUESTS: Duration = Duration::from_millis(500);
@@ -20,17 +20,13 @@ const TIME_BETWEEN_GITHUB_REQUESTS: Duration = Duration::from_millis(500);
 const ITEMS_PER_PAGE: u8 = 100;
 
 impl GitHub {
-    pub fn new(
-        pat: &str,
-        owner: &'static str,
-        repo: &'static str,
-    ) -> Result<GitHub, octocrab::Error> {
+    pub fn new(pat: &str, owner: &str, repo: &str) -> Result<GitHub, octocrab::Error> {
         Ok(Self {
             client: Octocrab::builder()
                 .personal_token(pat.to_string())
                 .build()?,
-            owner,
-            repo,
+            owner:owner.to_string(),
+            repo:repo.to_string(),
         })
     }
     pub async fn iter_issues(self) -> Result<IssueIterator, Box<dyn Error + Sync + Send>> {
@@ -40,7 +36,7 @@ impl GitHub {
         sleep(TIME_BETWEEN_GITHUB_REQUESTS).await;
         let number_of_pages = self
             .client
-            .issues(self.owner, self.repo)
+            .issues(&self.owner, &self.repo)
             .list()
             .state(octocrab::params::State::All)
             .per_page(ITEMS_PER_PAGE) // Fetch only one issue to get total count
@@ -54,7 +50,7 @@ impl GitHub {
     async fn fetch_issues_page(&self, index: u32) -> Result<Page<Issue>, Box<dyn Error + Sync + Send>> {
         sleep(TIME_BETWEEN_GITHUB_REQUESTS).await;
         let page = self.client
-            .issues(self.owner, self.repo)
+            .issues(&self.owner, &self.repo)
             .list()
             .state(octocrab::params::State::All)
             .per_page(ITEMS_PER_PAGE) // Adjust the per_page value as needed
@@ -67,7 +63,7 @@ impl GitHub {
         sleep(TIME_BETWEEN_GITHUB_REQUESTS).await;
         let comments = self
             .client
-            .issues(self.owner, self.repo)
+            .issues(&self.owner, &self.repo)
             .list_comments(issue_number)
             .per_page(ITEMS_PER_PAGE)
             .page(0_u32)
