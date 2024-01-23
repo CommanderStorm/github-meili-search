@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::usize;
+use chrono::{DateTime, Utc};
 
 use indicatif::{ProgressBar, ProgressStyle};
 use octocrab::models::{issues::Comment, issues::Issue};
@@ -85,6 +86,7 @@ pub struct SearchableIssue {
     title: String,
     body: String,
     comments: Vec<SearchableComment>,
+    last_update_at: DateTime<Utc>
 }
 
 impl From<Issue> for SearchableIssue {
@@ -93,6 +95,7 @@ impl From<Issue> for SearchableIssue {
             title: value.title,
             body: value.body.unwrap_or_default(),
             id: *value.id,
+            last_update_at: value.updated_at,
             comments: vec![],
         }
     }

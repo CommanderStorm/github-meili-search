@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO issue_log(id, hash, last_update_at)\n            VALUES ($1, $2, $3)\n            ON CONFLICT DO UPDATE SET hash=$2, last_update_at=$3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "caf5c1fdd45e971b043715b14644225f0c4c9e3efe732692cfc23a90ee56e07d"
+}

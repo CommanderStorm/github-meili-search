@@ -50,7 +50,7 @@ async fn main() -> Result<(), Box<dyn Error + Sync + Send>> {
         ms_client.store(&[issue.clone()]).await?;
         let mut hasher = DefaultHasher::new();
         issue.hash(&mut hasher);
-        db.store(u64_from_i64(issue.id), u64_from_i64(hasher.finish())).await?;
+        db.store(u64_from_i64(issue.id), u64_from_i64(hasher.finish()),issue.last_update_at).await?;
     }
     Ok(())
 }

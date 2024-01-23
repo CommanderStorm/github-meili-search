@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::fmt::Debug;
 use std::io;
 use std::time::Duration;
 
@@ -88,7 +89,7 @@ impl Meilisearch {
                 code = res.status(),
                 text = res.text().await?
             ))
-            .into());
+                .into());
         }
 
         let settings = Meilisearch::setttings();
@@ -104,7 +105,7 @@ impl Meilisearch {
             _ => Ok(Self { client }),
         }
     }
-    pub async fn store<T: Serialize>(
+    pub async fn store<T: Serialize+Debug>(
         &self,
         documents: &[T],
     ) -> Result<(), Box<dyn Error + Sync + Send>> {
@@ -115,10 +116,11 @@ impl Meilisearch {
             .wait_for_completion(&self.client, POLLING_RATE, TIMEOUT)
             .await?;
         match res {
-            Task::Failed { content } => Err(io::Error::other(format!(
-                "Failed to add documents to Meilisearch: {content:#?}"
-            ))
-            .into()),
+            Task::Failed { content } => {
+                println!("Failed to add documents to Meilisearch: {content:#?}");
+                println!("doc={documents:?}");
+                Err(io::Error::other("Failed to add documents to Meilisearch".to_string()).into())
+            }
             _ => Ok(()),
         }
     }
