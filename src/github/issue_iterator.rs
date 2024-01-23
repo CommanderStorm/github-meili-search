@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc};
 use indicatif::{ProgressBar, ProgressStyle};
 use octocrab::models::{issues::Comment, issues::Issue};
 use octocrab::Page;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
 use crate::github::GitHub;
@@ -83,20 +84,30 @@ impl IssueIterator {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash)]
 pub struct SearchableIssue {
     pub id: u64,
+    pub last_update_at: DateTime<Utc>,
     title: String,
     body: String,
     comments: Vec<SearchableComment>,
-    last_update_at: DateTime<Utc>
+    url: Url,
+    sanitised_body: String,
 }
 
 impl From<Issue> for SearchableIssue {
     fn from(value: Issue) -> Self {
+        let body=value.body.unwrap_or_default();
+
+        let parser = pulldown_cmark::Parser::new(&body);
+        let mut html_output = String::new();
+        pulldown_cmark::html::push_html(&mut html_output, parser);
+        let sanitised_body= ammonia::clean(&html_output);
         Self {
-            title: value.title,
-            body: value.body.unwrap_or_default(),
             id: *value.id,
             last_update_at: value.updated_at,
+            title: value.title,
+            sanitised_body,
+            body,
             comments: vec![],
+            url:value.html_url,
         }
     }
 }

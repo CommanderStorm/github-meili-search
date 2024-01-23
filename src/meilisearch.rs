@@ -73,7 +73,7 @@ impl Meilisearch {
                 default: Embedder {
                     source: "huggingFace".to_string(),
                     model: "BAAI/bge-base-en-v1.5".to_string(),
-                    document_template: "A github issue titled '{{doc.title}}' whose description starts with {{doc.body|truncatewords: 20}}".to_string(),
+                    document_template: "A github issue titled '{{doc.title}}' whose description starts with {{doc.sanitised_body|truncatewords: 20}}".to_string(),
                 }
             }
         };
@@ -118,7 +118,7 @@ impl Meilisearch {
         match res {
             Task::Failed { content } => {
                 println!("Failed to add documents to Meilisearch: {content:#?}");
-                println!("doc={documents:?}");
+                println!("doc={documents:#?}");
                 Err(io::Error::other("Failed to add documents to Meilisearch".to_string()).into())
             }
             _ => Ok(()),

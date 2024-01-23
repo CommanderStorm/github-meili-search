@@ -19,7 +19,7 @@ pub struct GitHub {
     last_change_at: DateTime<Utc>,
 }
 
-const TIME_BETWEEN_GITHUB_REQUESTS: Duration = Duration::from_millis(500);
+const TIME_BETWEEN_GITHUB_REQUESTS: Duration = Duration::from_millis(200);
 
 const ITEMS_PER_PAGE: u8 = 100;
 
