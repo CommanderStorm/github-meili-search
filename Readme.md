@@ -12,7 +12,10 @@ GitHub-Meili-Search is an adapter written in Rust, designed to seamlessly integr
 Before using GitHub-Meili-Search, make sure you have the following prerequisites installed:
 
 - [Rust](https://www.rust-lang.org/tools/install)
-- [MeiliSearch](https://www.meilisearch.com/docs/learn/getting_started/installation), e.g. via running `docker run -it --rm -p 7700:7700 getmeili/meilisearch:latest`
+- [MeiliSearch](https://www.meilisearch.com/docs/learn/getting_started/installation), e.g. via running
+  ```sh
+  docker run -it --rm -p 7700:7700 -v $(pwd)/meili_data:/meili_data  getmeili/meilisearch:v1.6
+  ```
 
 ### Installation
 
