@@ -11,7 +11,7 @@ lto = "thin"
 
 [dependencies]
 meilisearch-sdk = { version = "0.24.3", default-features = false }
-octocrab = { version = "0.33.1", default-features = false, features = ["rustls","rustls-webpki-tokio", "timeout", "retry"] }
+octocrab = { version = "0.33.3", default-features = false, features = ["rustls","rustls-webpki-tokio", "timeout", "retry"] }
 tokio = { version = "1.36.0", features = ["macros", "rt"], default-features = false }
 indicatif = { version = "0.17.7", default-features = false }
 serde = { version = "1.0.195", features = ["derive"], default-features = false }
