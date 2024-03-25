@@ -20,4 +20,4 @@ sqlx = { version = "0.7.3", features = ["sqlite", "chrono", "runtime-tokio-rustl
 clap = { version = "4.5.1", features = ["env", "derive", "std"], default-features = false }
 chrono = { version = "0.4.34", default-features = false, features = [] }
 pulldown-cmark = { version ="0.9.3", default-features = false }
-ammonia = { version ="3.3.0", default-features = false }
+ammonia = { version ="4.0.0", default-features = false }
