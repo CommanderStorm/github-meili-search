@@ -18,6 +18,6 @@ serde = { version = "1.0.197", features = ["derive"], default-features = false }
 reqwest = { version = "0.11.26", features = ["json", "tokio-rustls", "rustls-tls-webpki-roots"], default-features = false }
 sqlx = { version = "0.7.3", features = ["sqlite", "chrono", "runtime-tokio-rustls", "migrate", "macros"], default-features = false }
 clap = { version = "4.5.1", features = ["env", "derive", "std"], default-features = false }
-chrono = { version = "0.4.34", default-features = false, features = [] }
+chrono = { version = "0.4.37", default-features = false, features = [] }
 pulldown-cmark = { version ="0.9.3", default-features = false }
 ammonia = { version ="3.3.0", default-features = false }
